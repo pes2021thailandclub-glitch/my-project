@@ -1,0 +1,374 @@
+.coin-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+}
+
+.coin-icon {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+/* การจัดหน้าโดยรวม */
+.card-display-container {
+    margin-top: 30px;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.card-group {
+    margin-bottom: 20px;
+}
+
+.card-group h4 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* ตารางแสดงการ์ด */
+.cards-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+/* สไตล์พื้นฐานของการ์ดนักเตะ */
+.player-card {
+    position: relative;
+    width: 136px;
+    min-height: 210px;
+    border-radius: 8px;
+    border: 2px dashed #ccc;
+    background: #eef0f2;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    opacity: 0.6;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+}
+
+.player-image {
+    width: 120px;
+    height: 170px;
+    object-fit: cover;
+    border-radius: 6px;
+    display: block;
+    background: #fff;
+}
+
+.card-label {
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.2;
+    word-break: break-word;
+}
+
+/* สไตล์การ์ดประเภท Epic (สีทอง) */
+.player-card.epic {
+    border-color: #d4af37;
+}
+
+/* สไตล์การ์ดประเภท Highlight (สีม่วง/น้ำเงิน) */
+.player-card.highlight {
+    border-color: #4a90e2;
+}
+
+/* เครื่องหมายติ๊กถูก (ซ่อนไว้ตอนแรก) */
+.player-card .checkmark {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 18px;
+    color: #aaa;
+    visibility: hidden;
+}
+
+/* เมื่อการ์ดถูกเปิดใช้งาน (ตามจำนวนที่คำนวณได้) */
+.player-card.active {
+    opacity: 1;
+    border-style: solid;
+    transform: scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.player-card.epic.active {
+    background: linear-gradient(135deg, #ffe066, #d4af37);
+    color: #fff;
+}
+
+.player-card.highlight.active {
+    background: linear-gradient(135deg, #73a6fc, #4a90e2);
+    color: #fff;
+}
+
+.player-card.active .checkmark {
+    visibility: visible;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.player-card.image-missing .card-label {
+    color: #666;
+}
+
+.efootball-table-container {
+    margin-top: 24px;
+    overflow-x: auto;
+}
+
+.coins-probability-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.coins-probability-table th,
+.coins-probability-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #e8e8e8;
+    text-align: center;
+    font-size: 14px;
+}
+
+.coins-probability-table th {
+    background: linear-gradient(135deg, #1f3c88, #2c6ecf);
+    color: #fff;
+    font-weight: 700;
+}
+
+.th-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.header-icon {
+    font-size: 18px;
+}
+
+.coin-col {
+    font-weight: 700;
+    color: #1f3c88;
+}
+
+.draw-col {
+    font-weight: 700;
+    color: #333;
+}
+
+.prob-col {
+    min-width: 220px;
+}
+
+.progress-wrapper {
+    position: relative;
+    width: 100%;
+    height: 24px;
+    background: #eef2f7;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+.bar-green {
+    background: linear-gradient(90deg, #24c76b, #1fa65b);
+}
+
+.bar-gold {
+    background: linear-gradient(90deg, #ffd54f, #f4b400);
+}
+
+.pct-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.text-white {
+    color: #fff;
+}
+
+.text-gold {
+    color: #b8860b;
+    font-weight: 700;
+}
+
+.text-lightgreen {
+    color: #1f8f4d;
+    font-weight: 700;
+}
+
+.row-gold-highlight {
+    background: #fff8e1;
+}
+
+.row-max-green {
+    background: #f2fff6;
+    box-shadow: inset 0 0 0 1px #7ee08d;
+}
+
+.feature-section {
+    display: grid;
+    gap: 16px;
+    margin-top: 24px;
+}
+
+.panel-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.panel-card h3 {
+    margin: 0 0 8px;
+    color: #163b6d;
+}
+
+.panel-caption {
+    margin: 0 0 12px;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.summary-card {
+    background: linear-gradient(135deg, #f8fbff, #eef5ff);
+    border: 1px solid #dbe9ff;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.summary-label {
+    display: block;
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 6px;
+}
+
+.summary-value {
+    display: block;
+    font-size: 20px;
+    font-weight: 700;
+    color: #163b6d;
+}
+
+.compare-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.compare-card {
+    border-radius: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.compare-card.active {
+    background: linear-gradient(135deg, #fff8e1, #ffe9b0);
+    border-color: #f4b400;
+}
+
+.compare-label {
+    font-size: 12px;
+    color: #64748b;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.compare-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: #163b6d;
+}
+
+.simulation-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.simulation-controls label {
+    font-weight: 600;
+    color: #334155;
+}
+
+.simulation-controls input {
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    min-width: 120px;
+}
+
+.simulation-controls button {
+    border: none;
+    border-radius: 8px;
+    padding: 9px 12px;
+    background: linear-gradient(135deg, #1f3c88, #2c6ecf);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.simulation-results {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.simulation-result-card {
+    background: #f8fbff;
+    border: 1px solid #dbe9ff;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.simulation-result-card strong {
+    display: block;
+    margin-top: 4px;
+    color: #163b6d;
+    font-size: 18px;
+}
+
+.simulation-result-card small {
+    color: #64748b;
+}
