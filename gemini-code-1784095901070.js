@@ -9,20 +9,20 @@ const runSimulationBtn = document.getElementById("runSimulationBtn");
 const simulationResults = document.getElementById("simulationResults");
 
 const epicCardsData = [
-  { name: "Marcel Desailly", image: "https://efimg.com/efootballhub22/images/player_cards/89138288270047_l.png" },
-  { name: "Patrick Vieira", image: "https://efimg.com/efootballhub22/images/player_cards/88044145348029_l.png" },
-  { name: "Lilian Thuram", image: "https://efimg.com/efootballhub22/images/player_cards/88044145351392_l.png" }
+  { name: "Andres Iniesta", image: "https://efimg.com/efootballhub22/images/player_cards/89138288136169_l.png" },
+  { name: "Gerard Pique", image: "https://efimg.com/efootballhub22/images/player_cards/88041460867519_l.png" },
+  { name: "David Villa", image: "https://efimg.com/efootballhub22/images/player_cards/88044145220884_l.png" }
 ];
 
 const highlightCardsData = [
-  { name: "Lucas Digne", image: "https://efimg.com/efootballhub22/images/player_cards/105858595860513_l.png" },
-  { name: "Adrien Rabiot", image: "https://efimg.com/efootballhub22/images/player_cards/105858595862475_l.png" },
-  { name: "Lucas Hernandez", image: "https://efimg.com/efootballhub22/images/player_cards/105858595920141_l.png" },
-  { name: "Marcus Thuram", image: "https://efimg.com/efootballhub22/images/player_cards/105858595923493_l.png" },
-  { name: "Jean-Philippe Mateta", image: "https://efimg.com/efootballhub22/images/player_cards/105858595930001_l.png" },
-  { name: "Manu Kone", image: "https://efimg.com/efootballhub22/images/player_cards/105858595943762_l.png" },
-  { name: "Maghnes Akliouche", image: "https://efimg.com/efootballhub22/images/player_cards/105858595963596_l.png" },
-  { name: "Desire Doue", image: "https://efimg.com/efootballhub22/images/player_cards/105858595968352_l.png" }
+  { name: "Alejandro Grimaldo", image: "https://efimg.com/efootballhub22/images/player_cards/105859132787394_l.png" },
+  { name: "Unai Simon", image: "https://efimg.com/efootballhub22/images/player_cards/105859132793293_l.png" },
+  { name: "Marc Cucurella", image: "https://efimg.com/efootballhub22/images/player_cards/105859132802911_l.png" },
+  { name: "Pedro Porro", image: "https://efimg.com/efootballhub22/images/player_cards/105859132806164_l.png" },
+  { name: "Martin Zubimendi", image: "https://efimg.com/efootballhub22/images/player_cards/105859132816538_l.png" },
+  { name: "Alex Baena", image: "https://efimg.com/efootballhub22/images/player_cards/105859132821094_l.png" },
+  { name: "Yeremy Pino", image: "https://efimg.com/efootballhub22/images/player_cards/105859132827344_l.png" },
+  { name: "Gavi", image: "https://efimg.com/efootballhub22/images/player_cards/105859132833571_l.png" }
 ];
 
 function createCard(type, index, cardData) {
