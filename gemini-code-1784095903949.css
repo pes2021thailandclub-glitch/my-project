@@ -13,7 +13,7 @@
     vertical-align: middle;
 }
 
-/* การจัดหน้าโดยรวม */
+/* Page layout */
 .card-display-container {
     margin-top: 30px;
     padding: 20px;
@@ -31,18 +31,18 @@
     color: #333;
 }
 
-/* ตารางแสดงการ์ด */
+/* Card display grid */
 .cards-grid {
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
 }
 
-/* สไตล์พื้นฐานของการ์ดนักเตะ */
+/* Base player card styles */
 .player-card {
     position: relative;
-    width: 136px;
-    min-height: 210px;
+    width: 150px;
+    min-height: 230px;
     border-radius: 8px;
     border: 2px dashed #ccc;
     background: #eef0f2;
@@ -65,8 +65,8 @@
 }
 
 .player-image {
-    width: 120px;
-    height: 170px;
+    width: 132px;
+    height: 186px;
     object-fit: cover;
     border-radius: 6px;
     display: block;
@@ -80,17 +80,17 @@
     word-break: break-word;
 }
 
-/* สไตล์การ์ดประเภท Epic (สีทอง) */
+/* Epic card styling (gold) */
 .player-card.epic {
     border-color: #d4af37;
 }
 
-/* สไตล์การ์ดประเภท Highlight (สีม่วง/น้ำเงิน) */
+/* Highlight card styling (blue/purple) */
 .player-card.highlight {
     border-color: #4a90e2;
 }
 
-/* เครื่องหมายติ๊กถูก (ซ่อนไว้ตอนแรก) */
+/* Checkmark (hidden by default) */
 .player-card .checkmark {
     position: absolute;
     top: 6px;
@@ -100,7 +100,7 @@
     visibility: hidden;
 }
 
-/* เมื่อการ์ดถูกเปิดใช้งาน (ตามจำนวนที่คำนวณได้) */
+/* When a card is activated based on the calculated amount */
 .player-card.active {
     opacity: 1;
     border-style: solid;
@@ -118,6 +118,34 @@
     color: #fff;
 }
 
+.player-card.standard {
+    border-color: #94a3b8;
+    background: #f8fafc;
+}
+
+.player-card.standard .card-subtext {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.player-card.standard .standard-placeholder {
+    font-size: 28px;
+    color: #94a3b8;
+}
+
+.player-card.opened {
+    opacity: 1;
+    border-style: solid;
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
+}
+
+.player-card.standard.opened {
+    background: linear-gradient(135deg, #e2e8f0, #f8fafc);
+    border-color: #475569;
+}
+
 .player-card.active .checkmark {
     visibility: visible;
     color: #fff;
@@ -128,8 +156,12 @@
     color: #666;
 }
 
-.efootball-table-container {
+.probability-overview-card {
     margin-top: 24px;
+}
+
+.efootball-table-container {
+    margin-top: 12px;
     overflow-x: auto;
 }
 
@@ -148,6 +180,11 @@
     border-bottom: 1px solid #e8e8e8;
     text-align: center;
     font-size: 14px;
+    vertical-align: middle;
+}
+
+.coins-probability-table tbody tr:hover {
+    background: #f8fbff;
 }
 
 .coins-probability-table th {
@@ -248,6 +285,112 @@
     border-radius: 14px;
     padding: 18px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.opening-panel {
+    margin-top: 18px;
+    padding: 24px;
+}
+
+.opening-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.opening-btn {
+    border: none;
+    border-radius: 999px;
+    padding: 9px 14px;
+    font-weight: 700;
+    cursor: pointer;
+    color: #fff;
+}
+
+.opening-btn.primary {
+    background: linear-gradient(135deg, #1f3c88, #2c6ecf);
+}
+
+.opening-btn.secondary {
+    background: linear-gradient(135deg, #f59e0b, #ef4444);
+}
+
+.opening-btn.reset {
+    background: linear-gradient(135deg, #64748b, #334155);
+}
+
+.opening-summary {
+    background: #f8fbff;
+    border: 1px solid #dbe9ff;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    color: #163b6d;
+    line-height: 1.5;
+}
+
+.opening-stats {
+    background: linear-gradient(135deg, #fff8e1, #ffe9b0);
+    border: 1px solid #f4b400;
+    border-radius: 12px;
+    padding: 10px 12px;
+    margin-bottom: 10px;
+    font-weight: 700;
+    color: #92400e;
+}
+
+.opening-user {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.opening-history {
+    display: grid;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.opening-history-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #f8fafc;
+    font-size: 13px;
+}
+
+.history-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+}
+
+.history-badge.epic {
+    background: linear-gradient(135deg, #d4af37, #b8860b);
+}
+
+.history-badge.highlight {
+    background: linear-gradient(135deg, #4a90e2, #2563eb);
+}
+
+.history-badge.standard {
+    background: linear-gradient(135deg, #64748b, #334155);
+}
+
+.standard-grid {
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 6px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 14px;
 }
 
 .panel-card h3 {
@@ -362,6 +505,54 @@
     padding: 12px;
 }
 
+body {
+    margin: 0;
+    padding: 16px;
+    font-family: Arial, sans-serif;
+    background: #f5f7fb;
+    color: #111827;
+    box-sizing: border-box;
+}
+
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.card-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.card-input input[type="range"] {
+    flex: 1 1 220px;
+    min-width: 0;
+}
+
+.card-input input[type="number"] {
+    width: 120px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+}
+
+.result {
+    background: #fff;
+    border-radius: 14px;
+    padding: 18px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.probability {
+    display: grid;
+    gap: 6px;
+}
+
 .simulation-result-card strong {
     display: block;
     margin-top: 4px;
@@ -371,4 +562,80 @@
 
 .simulation-result-card small {
     color: #64748b;
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 12px;
+    }
+
+    .coin-label {
+        width: 100%;
+    }
+
+    .card-input {
+        align-items: stretch;
+    }
+
+    .card-input input[type="number"] {
+        width: 100%;
+    }
+
+    .result,
+    .panel-card,
+    .card-display-container {
+        padding: 14px;
+    }
+
+    .player-card {
+        width: calc(50% - 6px);
+        min-height: 190px;
+    }
+
+    .player-image {
+        width: 100%;
+        height: 140px;
+    }
+
+    .cards-grid {
+        gap: 10px;
+    }
+
+    .simulation-controls {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .simulation-controls input,
+    .simulation-controls button {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    .player-card {
+        width: 100%;
+        min-height: 170px;
+    }
+
+    .player-image {
+        height: 120px;
+    }
+
+    .summary-value {
+        font-size: 16px;
+    }
+
+    .compare-value,
+    .simulation-result-card strong {
+        font-size: 16px;
+    }
 }
