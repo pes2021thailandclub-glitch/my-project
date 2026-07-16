@@ -34,7 +34,8 @@
 /* Card display grid */
 .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    /* ปรับปรุง: ใช้ auto-fill ร่วมกับขนาดขั้นต่ำที่เหมาะสมในมือถือ */
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     gap: 12px;
     justify-items: center;
     align-items: start;
@@ -45,13 +46,14 @@
     position: relative;
     width: 100%;
     max-width: 150px;
-    min-height: 230px;
+    /* ปรับปรุง: ถอด min-height ล็อกตายตัวออก เพื่อให้ยืดหยุ่นตามความสูงของรูปภาพจริง */
+    height: auto; 
     border-radius: 8px;
     border: 2px dashed #ccc;
     background: #eef0f2;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
     transition: all 0.3s ease;
     opacity: 0.6;
@@ -71,7 +73,8 @@
     width: 100%;
     max-width: 132px;
     height: auto;
-    aspect-ratio: 132 / 186;
+    /* ปรับปรุง: บังคับรักษาอัตราส่วนการ์ดให้คงที่เสมอในทุกอุปกรณ์ */
+    aspect-ratio: 132 / 186; 
     object-fit: cover;
     border-radius: 6px;
     display: block;
@@ -83,19 +86,22 @@
     text-align: center;
     line-height: 1.2;
     word-break: break-word;
+    margin-top: 4px;
 }
 
+/* Media Queries ปรับแต่งตามขนาดหน้าจอเพื่อความสมบูรณ์แบบ */
 @media (max-width: 900px) {
     .cards-grid,
     .standard-grid {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+        /* ให้แบ่งคอลัมน์อัตโนมัติแทนการล็อกจำนวนคอลัมน์ เพื่อความยืดหยุ่น */
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
     }
 }
 
 @media (max-width: 700px) {
     .cards-grid,
     .standard-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
         gap: 10px;
     }
 
@@ -105,7 +111,6 @@
     }
 
     .player-card {
-        min-height: 210px;
         padding: 6px;
         max-width: none;
     }
@@ -118,13 +123,13 @@
 @media (max-width: 480px) {
     .cards-grid,
     .standard-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* ในมือถือจอเล็กมาก ปรับขั้นต่ำของการ์ดลงเล็กน้อยเพื่อไม่ให้ล้นออกนอกจอ */
+        grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
         gap: 8px;
     }
 
     .player-card {
-        min-height: 180px;
-        padding: 5px;
+        padding: 4px;
     }
 
     .card-label {
@@ -150,13 +155,14 @@
     font-size: 18px;
     color: #aaa;
     visibility: hidden;
+    z-index: 2;
 }
 
 /* When a card is activated based on the calculated amount */
 .player-card.active {
     opacity: 1;
     border-style: solid;
-    transform: scale(1.05);
+    transform: scale(1.03); /* ลดลงเล็กน้อยจาก 1.05 เพื่อป้องกันไม่ให้ชนการ์ดข้างๆ บนจอมือถือ */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
 }
 
@@ -189,7 +195,7 @@
 .player-card.opened {
     opacity: 1;
     border-style: solid;
-    transform: translateY(-3px) scale(1.03);
+    transform: translateY(-3px) scale(1.02);
     box-shadow: 0 8px 16px rgba(15, 23, 42, 0.12);
 }
 
@@ -624,6 +630,7 @@ body {
     color: #64748b;
 }
 
+/* ปรับปรุง Responsive สากล: เอาการล็อกขนาดรูปภาพตายตัวออกทั้งหมด */
 @media (max-width: 768px) {
     body {
         padding: 12px;
@@ -656,30 +663,7 @@ body {
         padding: 14px;
     }
 
-    .player-card {
-        width: 100%;
-        max-width: 100%;
-        min-height: 190px;
-    }
-
-    .player-image {
-        width: 100%;
-        height: 140px;
-    }
-
-    .cards-grid {
-        gap: 10px;
-    }
-
-    .simulation-controls {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .simulation-controls input,
-    .simulation-controls button {
-        width: 100%;
-    }
+    /* ลบการล็อกความสูงและขนาดรูปภาพที่เคยผิดพลาดออก ให้ใช้ตาม aspect-ratio ด้านบน */
 }
 
 @media (max-width: 480px) {
@@ -689,15 +673,6 @@ body {
 
     h1 {
         font-size: 1.4rem;
-    }
-
-    .player-card {
-        width: 100%;
-        min-height: 170px;
-    }
-
-    .player-image {
-        height: 120px;
     }
 
     .summary-value {
