@@ -33,15 +33,17 @@
 
 /* Card display grid */
 .cards-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 12px;
+    justify-items: center;
 }
 
 /* Base player card styles */
 .player-card {
     position: relative;
-    width: 150px;
+    width: 100%;
+    max-width: 150px;
     min-height: 230px;
     border-radius: 8px;
     border: 2px dashed #ccc;
@@ -65,8 +67,10 @@
 }
 
 .player-image {
-    width: 132px;
-    height: 186px;
+    width: 100%;
+    max-width: 132px;
+    height: auto;
+    aspect-ratio: 132 / 186;
     object-fit: cover;
     border-radius: 6px;
     display: block;
@@ -78,6 +82,22 @@
     text-align: center;
     line-height: 1.2;
     word-break: break-word;
+}
+
+@media (max-width: 600px) {
+    .cards-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .player-card {
+        min-height: 210px;
+        padding: 6px;
+    }
+
+    .card-label {
+        font-size: 10px;
+    }
 }
 
 /* Epic card styling (gold) */
