@@ -17,16 +17,16 @@ function probability(draws) {
 
   if (draws > 150) draws = 150;
 
-  // 1. คำนวณความน่าจะเป็นที่จะได้ Epic อย่างน้อย 1 ใบ
+  // 1. Calculate the probability of getting at least 1 Epic
   const failEpic = combination(total - epicCount, draws) / combination(total, draws);
   const epicChance = (1 - failEpic) * 100;
 
-  // 2. คำนวณความน่าจะเป็นที่จะได้ Highlight อย่างน้อย 1 ใบ
+  // 2. Calculate the probability of getting at least 1 Highlight
   const failHl = combination(total - hlCount, draws) / combination(total, draws);
   const hlChance = (1 - failHl) * 100;
 
-  // 3. คำนวณจำนวนการ์ดเฉลี่ยที่คาดว่าจะได้ (Expected Value = n * (สูตรสุ่มแบบไม่ใส่คืน))
-  // ในทางสถิติการสุ่มแบบ Hypergeometric ค่าเฉลี่ยการ์ดที่จะได้คือ = draws * (จำนวนการ์ดชนิดนั้น / 150)
+  // 3. Calculate the expected number of cards (Expected Value = n * (sampling without replacement formula))
+  // In hypergeometric statistics, the expected cards received is = draws * (number of that card type / 150)
   const expectedEpic = Math.round(draws * (epicCount / total));
   const expectedHl = Math.round(draws * (hlCount / total));
 
