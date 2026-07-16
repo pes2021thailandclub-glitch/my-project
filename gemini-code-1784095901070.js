@@ -1,12 +1,21 @@
 const slider = document.getElementById("coinSlider");
 const input = document.getElementById("coinInput");
-const epicGrid = document.getElementById("epicCardsGrid");
-const hlGrid = document.getElementById("highlightCardsGrid");
 const dashboardSummary = document.getElementById("dashboardSummary");
 const compareGrid = document.getElementById("compareGrid");
+const probabilityTableBody = document.getElementById("probabilityTableBody");
+const openSingleBtn = document.getElementById("openSingleBtn");
+const openTenBtn = document.getElementById("openTenBtn");
+const resetOpeningBtn = document.getElementById("resetOpeningBtn");
+const openingSummary = document.getElementById("openingSummary");
+const openingStats = document.getElementById("openingStats");
+const openingHistory = document.getElementById("openingHistory");
+const standardGrid = document.getElementById("standardCardsGrid");
 const simulationCountInput = document.getElementById("simulationCount");
 const runSimulationBtn = document.getElementById("runSimulationBtn");
 const simulationResults = document.getElementById("simulationResults");
+
+const totalPoolSize = 150;
+const standardCardImageUrl = "https://www.konami.com/efootball/s/img/page/dreamteam/card_standard.jpg"; // Add one shared Standard card image URL here to use for all 139 cards
 
 const epicCardsData = [
   { name: "Andres Iniesta", image: "https://efimg.com/efootballhub22/images/player_cards/89138288136169_l.png" },
@@ -25,18 +34,42 @@ const highlightCardsData = [
   { name: "Gavi", image: "https://efimg.com/efootballhub22/images/player_cards/105859132833571_l.png" }
 ];
 
-function createCard(type, index, cardData) {
+const standardCardsData = Array.from({ length: 139 }, (_, index) => ({
+  name: `Standard Player ${index + 1}`,
+  rarity: "standard",
+  image: standardCardImageUrl
+}));
+
+let openedCards = [];
+let totalCoinsSpent = 0;
+let openedCardKeys = new Set();
+let remainingPackPool = [];
+
+function createCard(type, index, cardData, isOpened = false) {
   const imageHtml = cardData.image
     ? `<img class="player-image" src="${cardData.image}" alt="${cardData.name}" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing')">`
     : "";
 
-  const cardId = type === "epic" ? `epic-${index}` : `hl-${index}`;
+  const cardId = type === "epic"
+    ? `epic-${index}`
+    : type === "highlight"
+      ? `hl-${index}`
+      : `standard-${index}`;
+
+  const placeholderHtml = type === "standard" && !cardData.image
+    ? `<div class="standard-placeholder">★</div>`
+    : "";
+
+  const badgeText = type === "epic" ? "Epic" : type === "highlight" ? "Highlight" : "Standard";
+  const badgeHtml = `<div class="card-subtext">${badgeText}</div>`;
 
   return `
-    <div class="player-card ${type}" id="${cardId}">
+    <div class="player-card ${type} ${isOpened ? "opened" : ""}" id="${cardId}">
       <div class="card-content">
         ${imageHtml}
+        ${placeholderHtml}
         <div class="card-label">${cardData.name}</div>
+        ${badgeHtml}
       </div>
       <div class="checkmark">✓</div>
     </div>
@@ -44,23 +77,101 @@ function createCard(type, index, cardData) {
 }
 
 function initCards() {
-  epicGrid.innerHTML = '';
-  hlGrid.innerHTML = '';
+  standardGrid.innerHTML = '';
 
-  epicCardsData.forEach((card, index) => {
-    epicGrid.innerHTML += createCard("epic", index, card);
-  });
+  const combinedCards = [
+    ...epicCardsData.map((card, index) => ({ type: "epic", index, cardData: card })),
+    ...highlightCardsData.map((card, index) => ({ type: "highlight", index, cardData: card })),
+    ...standardCardsData.map((card, index) => ({ type: "standard", index, cardData: card }))
+  ];
 
-  highlightCardsData.forEach((card, index) => {
-    hlGrid.innerHTML += createCard("highlight", index, card);
+  combinedCards.forEach((item) => {
+    standardGrid.innerHTML += createCard(item.type, item.index, item.cardData);
   });
+}
+
+function createOpeningPool() {
+  return shufflePool([
+    ...epicCardsData.map((card, index) => ({ type: "epic", index, cardData: card, key: `epic-${index}` })),
+    ...highlightCardsData.map((card, index) => ({ type: "highlight", index, cardData: card, key: `hl-${index}` })),
+    ...standardCardsData.map((card, index) => ({ type: "standard", index, cardData: card, key: `standard-${index}` }))
+  ]);
+}
+
+function resetOpeningState() {
+  openedCards = [];
+  totalCoinsSpent = 0;
+  openedCardKeys = new Set();
+  remainingPackPool = createOpeningPool();
+  openingSummary.innerHTML = 'No cards opened yet<br><span class="opening-user">Opened by: You</span>';
+  openingStats.textContent = `Coins spent: ${totalCoinsSpent.toLocaleString()}`;
+  openingHistory.innerHTML = '';
+  document.querySelectorAll('.player-card').forEach((card) => card.classList.remove('opened'));
+}
+
+function renderOpeningResults(results) {
+  const epicCount = results.filter((item) => item.type === "epic").length;
+  const highlightCount = results.filter((item) => item.type === "highlight").length;
+  const standardCount = results.filter((item) => item.type === "standard").length;
+  const openedCount = openedCardKeys.size;
+  const remainingCount = totalPoolSize - openedCount;
+
+  openingSummary.innerHTML = `
+    <strong>${openedCount} cards</strong> opened from a 150-card pool<br>
+    <span class="opening-user">Opened by: You · Epic ${epicCount} · Highlight ${highlightCount} · Standard ${standardCount} · Remaining ${remainingCount} cards</span>
+  `;
+
+  openingHistory.innerHTML = openedCards
+    .filter((item) => item.type === "epic" || item.type === "highlight")
+    .map((item) => {
+      const badgeClass = item.type === "epic" ? "epic" : "highlight";
+      return `
+        <div class="opening-history-item">
+          <span class="history-badge ${badgeClass}">${item.type === "epic" ? "EPIC" : "Highlight"}</span>
+          <span>${item.cardData.name}</span>
+        </div>
+      `;
+    }).join("");
+
+  document.querySelectorAll('.player-card').forEach((card) => card.classList.remove('opened'));
+
+  openedCardKeys.forEach((cardId) => {
+    const card = document.getElementById(cardId);
+    if (card) card.classList.add('opened');
+  });
+}
+
+function openCards(drawCount) {
+  const safeCount = Math.max(1, Math.min(10, drawCount));
+  const availableCount = Math.min(safeCount, remainingPackPool.length);
+
+  if (availableCount <= 0) {
+    openingSummary.innerHTML = '<strong>Pack pool is full</strong><br><span class="opening-user">You have opened all 150 cards</span>';
+    return;
+  }
+
+  const coinsUsed = safeCount === 1 ? 100 : 900;
+  totalCoinsSpent += coinsUsed;
+  const results = [];
+
+  for (let i = 0; i < availableCount; i++) {
+    const selectedCard = remainingPackPool.pop();
+    if (!selectedCard) break;
+
+    results.push(selectedCard);
+    openedCardKeys.add(selectedCard.key);
+  }
+
+  openedCards = [...openedCards, ...results];
+  openingStats.textContent = `Coins spent: ${totalCoinsSpent.toLocaleString()}`;
+  renderOpeningResults(results);
 }
 
 function renderDashboard(result, draw) {
   dashboardSummary.innerHTML = `
     <div class="summary-card">
-      <span class="summary-label">จำนวนการสุ่ม</span>
-      <span class="summary-value">${draw} ครั้ง</span>
+      <span class="summary-label">Draw count</span>
+      <span class="summary-value">${draw} draws</span>
     </div>
     <div class="summary-card">
       <span class="summary-label">Epic</span>
@@ -71,7 +182,7 @@ function renderDashboard(result, draw) {
       <span class="summary-value">${result.hlChance.toFixed(2)}%</span>
     </div>
     <div class="summary-card">
-      <span class="summary-label">คาดว่าจะได้</span>
+      <span class="summary-label">Expected</span>
       <span class="summary-value">Epic ${result.expectedEpic} · HL ${result.expectedHl}</span>
     </div>
   `;
@@ -87,11 +198,43 @@ function renderCompareMode(currentCoin) {
 
     return `
       <div class="compare-card ${isActive ? "active" : ""}">
-        <span class="compare-label">${coinValue.toLocaleString()} โคอิ่น</span>
-        <span class="compare-value">${draw} ครั้ง</span>
+        <span class="compare-label">${coinValue.toLocaleString()} Coins</span>
+        <span class="compare-value">${draw} draws</span>
         <div>Epic ${result.epicChance.toFixed(1)}%</div>
         <div>HL ${result.hlChance.toFixed(1)}%</div>
       </div>
+    `;
+  }).join("");
+}
+
+function renderProbabilityTable(currentCoin) {
+  const tableValues = [1000, 2000, 3000, 5000, 10000, 15000];
+
+  probabilityTableBody.innerHTML = tableValues.map((coinValue) => {
+    const draw = Math.floor(coinValue / 100);
+    const result = probability(draw);
+    const isActive = coinValue === currentCoin;
+    const epicPct = Math.min(100, result.epicChance);
+    const hlPct = Math.min(100, result.hlChance);
+
+    return `
+      <tr class="${isActive ? "row-gold-highlight" : ""}">
+        <td class="coin-col">${coinValue.toLocaleString()}</td>
+        <td class="draw-col">${draw} draws</td>
+        <td class="prob-col">
+          <div class="progress-wrapper">
+            <div class="progress-bar bar-gold" style="width: ${epicPct.toFixed(1)}%"></div>
+            <span class="pct-text text-white">${epicPct.toFixed(1)}%</span>
+          </div>
+        </td>
+        <td class="prob-col">
+          <div class="progress-wrapper">
+            <div class="progress-bar bar-green" style="width: ${hlPct.toFixed(1)}%"></div>
+            <span class="pct-text text-white">${hlPct.toFixed(1)}%</span>
+          </div>
+        </td>
+        <td class="draw-col">Epic ${result.expectedEpic} · HL ${result.expectedHl}</td>
+      </tr>
     `;
   }).join("");
 }
@@ -148,19 +291,19 @@ function renderSimulation(draws) {
 
   simulationResults.innerHTML = `
     <div class="simulation-result-card">
-      <small>Epic อย่างน้อย 1 ใบ</small>
+      <small>Epic at least 1 card</small>
       <strong>${result.epicChance.toFixed(1)}%</strong>
     </div>
     <div class="simulation-result-card">
-      <small>Highlight อย่างน้อย 1 ใบ</small>
+      <small>Highlight at least 1 card</small>
       <strong>${result.hlChance.toFixed(1)}%</strong>
     </div>
     <div class="simulation-result-card">
-      <small>Epic เฉลี่ยต่อรอบ</small>
+      <small>Epic average per round</small>
       <strong>${result.avgEpic.toFixed(2)}</strong>
     </div>
     <div class="simulation-result-card">
-      <small>Highlight เฉลี่ยต่อรอบ</small>
+      <small>Highlight average per round</small>
       <strong>${result.avgHl.toFixed(2)}</strong>
     </div>
   `;
@@ -168,6 +311,9 @@ function renderSimulation(draws) {
 
 slider.addEventListener("input", update);
 input.addEventListener("input", update);
+openSingleBtn.addEventListener("click", () => openCards(1));
+openTenBtn.addEventListener("click", () => openCards(10));
+resetOpeningBtn.addEventListener("click", resetOpeningState);
 runSimulationBtn.addEventListener("click", () => {
   const draw = Math.floor(Number(input.value || slider.value) / 100);
   renderSimulation(draw);
@@ -184,7 +330,7 @@ function update() {
   }
 
   const draw = Math.floor(coin / 100);
-  document.getElementById("drawCount").innerHTML = draw + " ครั้ง";
+  document.getElementById("drawCount").innerHTML = draw + " draws";
 
   const result = probability(draw);
 
@@ -193,6 +339,7 @@ function update() {
 
   renderDashboard(result, draw);
   renderCompareMode(coin);
+  renderProbabilityTable(coin);
 
   document.querySelectorAll('.player-card').forEach(card => card.classList.remove('active'));
 
@@ -208,5 +355,6 @@ function update() {
 }
 
 initCards();
+resetOpeningState();
 update();
 renderSimulation(Math.floor(Number(slider.value) / 100));
