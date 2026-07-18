@@ -1,360 +1,39 @@
-const slider = document.getElementById("coinSlider");
-const input = document.getElementById("coinInput");
-const dashboardSummary = document.getElementById("dashboardSummary");
-const compareGrid = document.getElementById("compareGrid");
-const probabilityTableBody = document.getElementById("probabilityTableBody");
-const openSingleBtn = document.getElementById("openSingleBtn");
-const openTenBtn = document.getElementById("openTenBtn");
-const resetOpeningBtn = document.getElementById("resetOpeningBtn");
-const openingSummary = document.getElementById("openingSummary");
-const openingStats = document.getElementById("openingStats");
-const openingHistory = document.getElementById("openingHistory");
-const standardGrid = document.getElementById("standardCardsGrid");
-const simulationCountInput = document.getElementById("simulationCount");
-const runSimulationBtn = document.getElementById("runSimulationBtn");
-const simulationResults = document.getElementById("simulationResults");
-
-const totalPoolSize = 150;
-const standardCardImageUrl = "https://www.konami.com/efootball/s/img/page/dreamteam/card_standard.jpg"; // Add one shared Standard card image URL here to use for all 139 cards
-
-const epicCardsData = [
-  { name: "Andres Iniesta", image: "https://efimg.com/efootballhub22/images/player_cards/89138288136169_l.png" },
-  { name: "Gerard Pique", image: "https://efimg.com/efootballhub22/images/player_cards/88041460867519_l.png" },
-  { name: "David Villa", image: "https://efimg.com/efootballhub22/images/player_cards/88044145220884_l.png" }
-];
-
-const highlightCardsData = [
-  { name: "Alejandro Grimaldo", image: "https://efimg.com/efootballhub22/images/player_cards/105859132787394_l.png" },
-  { name: "Unai Simon", image: "https://efimg.com/efootballhub22/images/player_cards/105859132793293_l.png" },
-  { name: "Marc Cucurella", image: "https://efimg.com/efootballhub22/images/player_cards/105859132802911_l.png" },
-  { name: "Pedro Porro", image: "https://efimg.com/efootballhub22/images/player_cards/105859132806164_l.png" },
-  { name: "Martin Zubimendi", image: "https://efimg.com/efootballhub22/images/player_cards/105859132816538_l.png" },
-  { name: "Alex Baena", image: "https://efimg.com/efootballhub22/images/player_cards/105859132821094_l.png" },
-  { name: "Yeremy Pino", image: "https://efimg.com/efootballhub22/images/player_cards/105859132827344_l.png" },
-  { name: "Gavi", image: "https://efimg.com/efootballhub22/images/player_cards/105859132833571_l.png" }
-];
-
-const standardCardsData = Array.from({ length: 139 }, (_, index) => ({
-  name: `Standard Player ${index + 1}`,
-  rarity: "standard",
-  image: standardCardImageUrl
-}));
-
-let openedCards = [];
-let totalCoinsSpent = 0;
-let openedCardKeys = new Set();
-let remainingPackPool = [];
-
-function createCard(type, index, cardData, isOpened = false) {
-  const imageHtml = cardData.image
-    ? `<img class="player-image" src="${cardData.image}" alt="${cardData.name}" onerror="this.style.display='none'; this.parentElement.classList.add('image-missing')">`
-    : "";
-
-  const cardId = type === "epic"
-    ? `epic-${index}`
-    : type === "highlight"
-      ? `hl-${index}`
-      : `standard-${index}`;
-
-  const placeholderHtml = type === "standard" && !cardData.image
-    ? `<div class="standard-placeholder">★</div>`
-    : "";
-
-  const badgeText = type === "epic" ? "Epic" : type === "highlight" ? "Highlight" : "Standard";
-  const badgeHtml = `<div class="card-subtext">${badgeText}</div>`;
-
-  return `
-    <div class="player-card ${type} ${isOpened ? "opened" : ""}" id="${cardId}">
-      <div class="card-content">
-        ${imageHtml}
-        ${placeholderHtml}
-        <div class="card-label">${cardData.name}</div>
-        ${badgeHtml}
-      </div>
-      <div class="checkmark">✓</div>
-    </div>
-  `;
-}
-
-function initCards() {
-  standardGrid.innerHTML = '';
-
-  const combinedCards = [
-    ...epicCardsData.map((card, index) => ({ type: "epic", index, cardData: card })),
-    ...highlightCardsData.map((card, index) => ({ type: "highlight", index, cardData: card })),
-    ...standardCardsData.map((card, index) => ({ type: "standard", index, cardData: card }))
-  ];
-
-  combinedCards.forEach((item) => {
-    standardGrid.innerHTML += createCard(item.type, item.index, item.cardData);
-  });
-}
-
-function createOpeningPool() {
-  return shufflePool([
-    ...epicCardsData.map((card, index) => ({ type: "epic", index, cardData: card, key: `epic-${index}` })),
-    ...highlightCardsData.map((card, index) => ({ type: "highlight", index, cardData: card, key: `hl-${index}` })),
-    ...standardCardsData.map((card, index) => ({ type: "standard", index, cardData: card, key: `standard-${index}` }))
-  ]);
-}
-
-function resetOpeningState() {
-  openedCards = [];
-  totalCoinsSpent = 0;
-  openedCardKeys = new Set();
-  remainingPackPool = createOpeningPool();
-  openingSummary.innerHTML = 'No cards opened yet<br><span class="opening-user">Opened by: You</span>';
-  openingStats.textContent = `Coins spent: ${totalCoinsSpent.toLocaleString()}`;
-  openingHistory.innerHTML = '';
-  document.querySelectorAll('.player-card').forEach((card) => card.classList.remove('opened'));
-}
-
-function renderOpeningResults(results) {
-  const epicCount = results.filter((item) => item.type === "epic").length;
-  const highlightCount = results.filter((item) => item.type === "highlight").length;
-  const standardCount = results.filter((item) => item.type === "standard").length;
-  const openedCount = openedCardKeys.size;
-  const remainingCount = totalPoolSize - openedCount;
-
-  openingSummary.innerHTML = `
-    <strong>${openedCount} cards</strong> opened from a 150-card pool<br>
-    <span class="opening-user">Opened by: You · Epic ${epicCount} · Highlight ${highlightCount} · Standard ${standardCount} · Remaining ${remainingCount} cards</span>
-  `;
-
-  openingHistory.innerHTML = openedCards
-    .filter((item) => item.type === "epic" || item.type === "highlight")
-    .map((item) => {
-      const badgeClass = item.type === "epic" ? "epic" : "highlight";
-      return `
-        <div class="opening-history-item">
-          <span class="history-badge ${badgeClass}">${item.type === "epic" ? "EPIC" : "Highlight"}</span>
-          <span>${item.cardData.name}</span>
-        </div>
-      `;
-    }).join("");
-
-  document.querySelectorAll('.player-card').forEach((card) => card.classList.remove('opened'));
-
-  openedCardKeys.forEach((cardId) => {
-    const card = document.getElementById(cardId);
-    if (card) card.classList.add('opened');
-  });
-}
-
-function openCards(drawCount) {
-  const safeCount = Math.max(1, Math.min(10, drawCount));
-  const availableCount = Math.min(safeCount, remainingPackPool.length);
-
-  if (availableCount <= 0) {
-    openingSummary.innerHTML = '<strong>Pack pool is full</strong><br><span class="opening-user">You have opened all 150 cards</span>';
-    return;
+function combination(n, k) {
+  if (k > n) return 0;
+  if (k === 0 || k === n) return 1;
+  let result = 1;
+  for (let i = 1; i <= k; i++) {
+    result *= (n - k + i);
+    result /= i;
   }
-
-  const coinsUsed = safeCount === 1 ? 100 : 900;
-  totalCoinsSpent += coinsUsed;
-  const results = [];
-
-  for (let i = 0; i < availableCount; i++) {
-    const selectedCard = remainingPackPool.pop();
-    if (!selectedCard) break;
-
-    results.push(selectedCard);
-    openedCardKeys.add(selectedCard.key);
-  }
-
-  openedCards = [...openedCards, ...results];
-  openingStats.textContent = `Coins spent: ${totalCoinsSpent.toLocaleString()}`;
-  renderOpeningResults(results);
+  return result;
 }
 
-function renderDashboard(result, draw) {
-  dashboardSummary.innerHTML = `
-    <div class="summary-card">
-      <span class="summary-label">Draw count</span>
-      <span class="summary-value">${draw} draws</span>
-    </div>
-    <div class="summary-card">
-      <span class="summary-label">Epic</span>
-      <span class="summary-value">${result.epicChance.toFixed(2)}%</span>
-    </div>
-    <div class="summary-card">
-      <span class="summary-label">Highlight</span>
-      <span class="summary-value">${result.hlChance.toFixed(2)}%</span>
-    </div>
-    <div class="summary-card">
-      <span class="summary-label">Expected</span>
-      <span class="summary-value">Epic ${result.expectedEpic} · HL ${result.expectedHl}</span>
-    </div>
-  `;
-}
+function probability(draws) {
+  const total = 150;
+  const epicCount = 3;
+  const hlCount = 8;
+  const normalCount = total - epicCount - hlCount; // 139
 
-function renderCompareMode(currentCoin) {
-  const compareValues = [1000, 3000, 5000, 10000];
+  if (draws > 150) draws = 150;
 
-  compareGrid.innerHTML = compareValues.map((coinValue) => {
-    const draw = Math.floor(coinValue / 100);
-    const result = probability(draw);
-    const isActive = coinValue === currentCoin;
+  // 1. Calculate the probability of getting at least 1 Epic
+  const failEpic = combination(total - epicCount, draws) / combination(total, draws);
+  const epicChance = (1 - failEpic) * 100;
 
-    return `
-      <div class="compare-card ${isActive ? "active" : ""}">
-        <span class="compare-label">${coinValue.toLocaleString()} Coins</span>
-        <span class="compare-value">${draw} draws</span>
-        <div>Epic ${result.epicChance.toFixed(1)}%</div>
-        <div>HL ${result.hlChance.toFixed(1)}%</div>
-      </div>
-    `;
-  }).join("");
-}
+  // 2. Calculate the probability of getting at least 1 Highlight
+  const failHl = combination(total - hlCount, draws) / combination(total, draws);
+  const hlChance = (1 - failHl) * 100;
 
-function renderProbabilityTable(currentCoin) {
-  const tableValues = [1000, 2000, 3000, 5000, 10000, 15000];
-
-  probabilityTableBody.innerHTML = tableValues.map((coinValue) => {
-    const draw = Math.floor(coinValue / 100);
-    const result = probability(draw);
-    const isActive = coinValue === currentCoin;
-    const epicPct = Math.min(100, result.epicChance);
-    const hlPct = Math.min(100, result.hlChance);
-
-    return `
-      <tr class="${isActive ? "row-gold-highlight" : ""}">
-        <td class="coin-col">${coinValue.toLocaleString()}</td>
-        <td class="draw-col">${draw} draws</td>
-        <td class="prob-col">
-          <div class="progress-wrapper">
-            <div class="progress-bar bar-gold" style="width: ${epicPct.toFixed(1)}%"></div>
-            <span class="pct-text text-white">${epicPct.toFixed(1)}%</span>
-          </div>
-        </td>
-        <td class="prob-col">
-          <div class="progress-wrapper">
-            <div class="progress-bar bar-green" style="width: ${hlPct.toFixed(1)}%"></div>
-            <span class="pct-text text-white">${hlPct.toFixed(1)}%</span>
-          </div>
-        </td>
-        <td class="draw-col">Epic ${result.expectedEpic} · HL ${result.expectedHl}</td>
-      </tr>
-    `;
-  }).join("");
-}
-
-function createSimulationPool() {
-  return Array.from({ length: 150 }, (_, index) => {
-    if (index < 3) return "epic";
-    if (index < 11) return "highlight";
-    return "normal";
-  });
-}
-
-function shufflePool(pool) {
-  const copy = [...pool];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
-
-function runSimulation(draws, iterations) {
-  const safeDraws = Math.max(1, Math.min(150, draws));
-  const safeIterations = Math.max(100, Math.min(10000, iterations));
-
-  let epicAtLeastOne = 0;
-  let hlAtLeastOne = 0;
-  let epicTotal = 0;
-  let hlTotal = 0;
-
-  for (let i = 0; i < safeIterations; i++) {
-    const drawn = shufflePool(createSimulationPool()).slice(0, safeDraws);
-    const epicCount = drawn.filter((card) => card === "epic").length;
-    const hlCount = drawn.filter((card) => card === "highlight").length;
-
-    if (epicCount > 0) epicAtLeastOne += 1;
-    if (hlCount > 0) hlAtLeastOne += 1;
-    epicTotal += epicCount;
-    hlTotal += hlCount;
-  }
+  // 3. Calculate the expected number of cards (Expected Value = draws * (count / total))
+  // For hypergeometric distribution, the expected value of target cards drawn is simple: draws * (targetCount / total)
+  const expectedEpic = Math.round(draws * (epicCount / total));
+  const expectedHl = Math.round(draws * (hlCount / total));
 
   return {
-    iterations: safeIterations,
-    epicChance: (epicAtLeastOne / safeIterations) * 100,
-    hlChance: (hlAtLeastOne / safeIterations) * 100,
-    avgEpic: epicTotal / safeIterations,
-    avgHl: hlTotal / safeIterations
+    epicChance: epicChance,
+    hlChance: hlChance,
+    expectedEpic: expectedEpic,
+    expectedHl: expectedHl
   };
 }
-
-function renderSimulation(draws) {
-  const iterations = Number(simulationCountInput.value) || 1000;
-  const result = runSimulation(draws, iterations);
-
-  simulationResults.innerHTML = `
-    <div class="simulation-result-card">
-      <small>Epic at least 1 card</small>
-      <strong>${result.epicChance.toFixed(1)}%</strong>
-    </div>
-    <div class="simulation-result-card">
-      <small>Highlight at least 1 card</small>
-      <strong>${result.hlChance.toFixed(1)}%</strong>
-    </div>
-    <div class="simulation-result-card">
-      <small>Epic average per round</small>
-      <strong>${result.avgEpic.toFixed(2)}</strong>
-    </div>
-    <div class="simulation-result-card">
-      <small>Highlight average per round</small>
-      <strong>${result.avgHl.toFixed(2)}</strong>
-    </div>
-  `;
-}
-
-slider.addEventListener("input", update);
-input.addEventListener("input", update);
-openSingleBtn.addEventListener("click", () => openCards(1));
-openTenBtn.addEventListener("click", () => openCards(10));
-resetOpeningBtn.addEventListener("click", resetOpeningState);
-runSimulationBtn.addEventListener("click", () => {
-  const draw = Math.floor(Number(input.value || slider.value) / 100);
-  renderSimulation(draw);
-});
-
-function update() {
-  let coin = Number(slider.value);
-
-  if (this === input) {
-    coin = Number(input.value);
-    slider.value = coin;
-  } else {
-    input.value = coin;
-  }
-
-  const draw = Math.floor(coin / 100);
-  document.getElementById("drawCount").innerHTML = draw + " draws";
-
-  const result = probability(draw);
-
-  document.getElementById("epicChance").innerHTML = result.epicChance.toFixed(2) + "%";
-  document.getElementById("hlChance").innerHTML = result.hlChance.toFixed(2) + "%";
-
-  renderDashboard(result, draw);
-  renderCompareMode(coin);
-  renderProbabilityTable(coin);
-
-  document.querySelectorAll('.player-card').forEach(card => card.classList.remove('active'));
-
-  for (let i = 0; i < result.expectedEpic; i++) {
-    const card = document.getElementById(`epic-${i}`);
-    if (card) card.classList.add('active');
-  }
-
-  for (let i = 0; i < result.expectedHl; i++) {
-    const card = document.getElementById(`hl-${i}`);
-    if (card) card.classList.add('active');
-  }
-}
-
-initCards();
-resetOpeningState();
-update();
-renderSimulation(Math.floor(Number(slider.value) / 100));
