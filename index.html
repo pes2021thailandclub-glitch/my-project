@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>eFootball Box Draw Calculator</title>
-    <link rel="stylesheet" href="gemini-code-1784095903949.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
@@ -34,6 +34,7 @@
                 <button type="button" id="openSingleBtn" class="opening-btn primary">100 Coins / 1 Card</button>
                 <button type="button" id="openTenBtn" class="opening-btn secondary">900 Coins / 10 Cards</button>
                 <button type="button" id="resetOpeningBtn" class="opening-btn reset">Reset</button>
+                <button type="button" id="soundToggleBtn" class="opening-btn sound-toggle" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255,255,255,0.12); color: #fbbf24;">🔊 Sound: ON</button>
             </div>
             <div class="opening-summary" id="openingSummary">No cards opened yet</div>
             <div class="opening-stats" id="openingStats">Coins spent: 0</div>
@@ -84,7 +85,36 @@
         </div>
     </div>
 
-    <script src="gemini-code-1784095849559.js"></script>
-    <script src="gemini-code-1784095901070.js"></script>
+    <!-- Cinematic Pack Reveal Modal Overlay -->
+    <div id="packModal" class="pack-modal hidden">
+        <div class="flash-overlay" id="flashOverlay"></div>
+        
+        <!-- Phase 1: Floating/Shaking Card Pack -->
+        <div class="pack-reveal-container" id="packRevealContainer">
+            <div class="pack-card-element" id="packCardElement">
+                <div class="pack-glow-sigil"></div>
+                <div class="pack-logo">⚽</div>
+                <div class="pack-label-text">Standard Pack</div>
+            </div>
+        </div>
+
+        <!-- Phase 2: Revealed Cards Grid -->
+        <div class="revealed-grid" id="revealedGrid"></div>
+
+        <!-- Phase 3: Reveal Action Buttons -->
+        <div class="reveal-controls" id="revealControls">
+            <button type="button" class="reveal-modal-btn skip" id="skipBtn">Skip</button>
+            <button type="button" class="reveal-modal-btn claim" id="claimBtn">Claim Cards</button>
+        </div>
+
+        <!-- Special Epic Cinematic Zoom Overlay -->
+        <div class="epic-cinematic-overlay" id="epicCinematicOverlay">
+            <div class="epic-cinematic-card-zoom" id="epicCinematicCardZoom"></div>
+            <div class="epic-title-reveal" id="epicTitleReveal">EPIC LEGEND!</div>
+        </div>
+    </div>
+
+    <script src="probability.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
